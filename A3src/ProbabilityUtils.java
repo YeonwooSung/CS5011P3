@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 
-
+/**
+ * This class contains the static methods that are used for variable elimination.
+ * @author 160021429
+ */
 public class ProbabilityUtils {
 
 	/**
@@ -27,6 +30,13 @@ public class ProbabilityUtils {
 	    }
 	}
 
+	/**
+	 * Add the probability values for the variable elimination algorithm.
+	 * @param values - list of probabilities.
+	 * @param list - list of permutations.
+	 * @param result - list to store the results.
+	 * @param sizeOfOutcomes - size of the outcomes
+	 */
 	public static void addProbabilityValues(ArrayList<Double> values, ArrayList<Double> list, ArrayList<Double> result, int sizeOfOutcomes) {
 		double[] vals = new double[list.size() * values.size()];
 		int index = 0;
@@ -50,8 +60,6 @@ public class ProbabilityUtils {
 			}
 		}
 
-
-		//TODO normalisation
 		double total = 0;
 		for (double d : result) {
 			total += d;

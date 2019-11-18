@@ -1,10 +1,13 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+/**
+ * The parser that parses the bayesian network for the predictive inference.
+ * @author 160021429
+ */
 public class BayesianNetworkParser {
 	private XMLParser parser;
 	private HashMap<String, BayesianNetworkNode> nodeMap;
@@ -27,6 +30,59 @@ public class BayesianNetworkParser {
 	}
 
 	/**
+	 * This method prints out the result of the variable elimination algorithm for the predictive inference.
+	 * @param node - current node
+	 */
+	private void printOutInferenceResult(BayesianNetworkNode node) {
+		ArrayList<Double> values = node.getValues();
+
+		System.out.println("Inference result:");
+		System.out.print("  P(" + node.getName() + ") = ");
+
+		int finalIndex = values.size() - 1;
+		for (int i = 0; i <= finalIndex; i += 1) {
+			double val = values.get(i);
+			System.out.print(val);
+
+			if (i != finalIndex) System.out.print(", ");
+			else System.out.print(" ");
+		}
+
+		System.out.println();
+		System.out.println();
+	}
+
+	/**
+	 * This method generates the string for the conditional probability.
+	 *
+	 * i.e. P(a | b, c)
+	 *
+	 * @param node - current node
+	 * @param given - list of parent nodes' names
+	 * @param sb - stirng builder
+	 */
+	private void generateConditionalProbabilityString(BayesianNetworkNode node, ArrayList<String> given, StringBuilder sb) {
+		int size = given.size();
+
+		if (size == 0) return;
+
+		sb.append("P(");
+		sb.append(node.getName());
+		sb.append(" | ");
+
+		int finalIndex = size - 1;
+
+		// use for loop to iterate the list
+		for (int i = 0; i <= finalIndex; i += 1) {
+			sb.append(given.get(i)); //append the name of the parent node to the string builder
+
+			if (i != finalIndex) sb.append(", ");
+		}
+
+		sb.append(")");
+	}
+
+	/**
 	 * This method performs the variable elimination for the given node.
 	 * @param node - target node
 	 * @return If there is no error, returns true. Otherwise, returns false.
@@ -41,6 +97,7 @@ public class BayesianNetworkParser {
 		// If the size of given list is 0, then that means that the current node does not have parent node.
 		if (given.size() == 0) {
 			node.setInference(true);
+			printOutInferenceResult(node);
 			return true;
 		}
 
@@ -59,6 +116,25 @@ public class BayesianNetworkParser {
 			lists.add(givenNode.getValues());
 		}
 
+		ArrayList<Double> values_before = node.getValues(); //get the list of original values
+
+		// use string builder to build a string for the conditional probability  i.e. P(a | b,c)
+		StringBuilder sb = new StringBuilder();
+		this.generateConditionalProbabilityString(node, given, sb);
+
+		System.out.println("Feature: " + node.getName());
+		System.out.print("Before Inference:\n  ");
+		System.out.print(sb.toString() + " = ");
+
+		int finalIndex = values_before.size() - 1;
+		for (int i = 0; i <= finalIndex; i += 1) {
+			double val = values_before.get(i);
+			System.out.print(val);
+
+			if (i != finalIndex) System.out.print(", ");
+		}
+		System.out.println();
+
 		ArrayList<Double> permutations = new ArrayList<Double>();
 
 		ProbabilityUtils.generatePermutations(lists, permutations, 0, 1); // generate the permutations
@@ -68,8 +144,11 @@ public class BayesianNetworkParser {
 
 		node.setValues(result); //store the result of the inference
 
-		node.setInference(true);
+		node.setInference(true); //mark this node as did inference
 		boolean checker = true;
+
+		printOutInferenceResult(node); //print out the result of inference
+
 		ArrayList<BayesianNetworkNode> children = node.getChildren();
 
 		// use for-each loop to iterate children
@@ -80,7 +159,11 @@ public class BayesianNetworkParser {
 		return checker;
 	}
 
-	ArrayList<BayesianNetworkNode> makeInferences() {
+	/**
+	 * Perform the predictive elimination for the bayesian network.
+	 * Basically, this method iterates all nodes in the network, and perform the variable elimination.
+	 */
+	void makeInferences() {
 		int count = 0;
 
 		while (true) {
@@ -112,23 +195,14 @@ public class BayesianNetworkParser {
 
 			count += 1;
 		}
+	}
 
-		ArrayList<BayesianNetworkNode> inferenceList = new ArrayList<BayesianNetworkNode>();
-
-		for (BayesianNetworkNode node : nodeList) {
-			//TODO
-//			System.out.println(node.getName());
-//			ArrayList<Double> values = node.getValues();
-//			for (double d : values) {
-//				System.out.print(d);
-//				System.out.print(" ");
-//			}
-//			System.out.println();
-			
-			if (node.isLeafNode()) inferenceList.add(node);
-		}
-
-		return inferenceList;
+	/**
+	 * Getter for nodeList.
+	 * @return nodeList
+	 */
+	public ArrayList<BayesianNetworkNode> getNodeList() {
+		return nodeList;
 	}
 
 	/**

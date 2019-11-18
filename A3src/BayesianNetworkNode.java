@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 
-
+/**
+ * The node of the bayesian network.
+ * @author 160021429
+ */
 public class BayesianNetworkNode {
 	private boolean inference;
 	private boolean leafNode;
