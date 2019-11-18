@@ -10,6 +10,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/**
+ * The aim of this class is to parse the xml file to build the bayesian network.
+ * @author 160021429
+ */
 public class XMLParser {
 	Element rootElement;
 
