@@ -13,7 +13,7 @@ public class A3main {
 
 		// check the number of command line arguments
 		if (args.length < 1) {
-			filePath = "bn1.xml";
+			filePath = "bnTest.xml";
 		} else {
 			filePath = args[0];
 		}
